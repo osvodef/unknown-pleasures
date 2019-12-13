@@ -1,20 +1,20 @@
-attribute vec2 a_position;
+attribute vec2 position;
 
-uniform float u_x_left;
-uniform float u_x_right;
-uniform float u_y;
+uniform float xLeft;
+uniform float xRight;
+uniform float yOffset;
 
-uniform float u_max_height;
+uniform float maxHeight;
 
-uniform vec2 u_screen_size;
+uniform vec2 screenSize;
 
 void main() {
     vec2 position_screen = vec2(
-        u_x_left + (u_x_right - u_x_left) * a_position.x,
-        u_y + a_position.y * u_max_height
+        xLeft + (xRight - xLeft) * position.x,
+        yOffset + position.y * maxHeight
     );
 
-    vec2 position_ndc = (position_screen) / (u_screen_size / 2.0) - vec2(1.0, 1.0);
+    vec2 position_ndc = (position_screen) / (screenSize / 2.0) - vec2(1.0, 1.0);
 
     gl_Position = vec4(position_ndc, 0.0, 1.0);
 }

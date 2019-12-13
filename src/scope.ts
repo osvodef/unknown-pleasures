@@ -66,15 +66,15 @@ export class Scope {
             gl,
             lineVertGlsl,
             lineFragGlsl,
-            ['a_position', 'a_normal'],
+            ['position', 'normal'],
             [
-                { name: 'u_color', type: '4f' },
-                { name: 'u_screen_size', type: '2f' },
-                { name: 'u_width', type: '1f' },
-                { name: 'u_max_height', type: '1f' },
-                { name: 'u_x_left', type: '1f' },
-                { name: 'u_x_right', type: '1f' },
-                { name: 'u_y', type: '1f' },
+                { name: 'color', type: '4f' },
+                { name: 'screenSize', type: '2f' },
+                { name: 'width', type: '1f' },
+                { name: 'maxHeight', type: '1f' },
+                { name: 'xLeft', type: '1f' },
+                { name: 'xRight', type: '1f' },
+                { name: 'yOffset', type: '1f' },
             ],
         );
 
@@ -82,23 +82,23 @@ export class Scope {
             gl,
             areaVertGlsl,
             areaFragGlsl,
-            ['a_position'],
+            ['position'],
             [
-                { name: 'u_color', type: '4f' },
-                { name: 'u_screen_size', type: '2f' },
-                { name: 'u_max_height', type: '1f' },
-                { name: 'u_x_left', type: '1f' },
-                { name: 'u_x_right', type: '1f' },
-                { name: 'u_y', type: '1f' },
+                { name: 'color', type: '4f' },
+                { name: 'screenSize', type: '2f' },
+                { name: 'maxHeight', type: '1f' },
+                { name: 'xLeft', type: '1f' },
+                { name: 'xRight', type: '1f' },
+                { name: 'yOffset', type: '1f' },
             ],
         );
 
         this.lineProgram.use();
-        this.lineProgram.bindUniform('u_color', ...lineColor);
+        this.lineProgram.bindUniform('color', ...lineColor);
 
         this.areaProgram.use();
-        this.areaProgram.bindUniform('u_max_height', lineMaxHeight);
-        this.areaProgram.bindUniform('u_color', ...backgroundColor);
+        this.areaProgram.bindUniform('maxHeight', lineMaxHeight);
+        this.areaProgram.bindUniform('color', ...backgroundColor);
 
         this.canvas.style.width = '100%';
         this.canvas.style.height = '100%';
@@ -127,17 +127,17 @@ export class Scope {
         const paddingLeftRight = (scaledWidth - scopeSize.x) / 2;
 
         this.lineProgram.use();
-        this.lineProgram.bindUniform('u_screen_size', scaledWidth, scaledHeight);
-        this.lineProgram.bindUniform('u_max_height', lineMaxHeight * scopeSize.y);
-        this.lineProgram.bindUniform('u_x_left', paddingLeftRight);
-        this.lineProgram.bindUniform('u_x_right', scaledWidth - paddingLeftRight);
-        this.lineProgram.bindUniform('u_width', scopeSize.y * lineWidth);
+        this.lineProgram.bindUniform('screenSize', scaledWidth, scaledHeight);
+        this.lineProgram.bindUniform('maxHeight', lineMaxHeight * scopeSize.y);
+        this.lineProgram.bindUniform('xLeft', paddingLeftRight);
+        this.lineProgram.bindUniform('xRight', scaledWidth - paddingLeftRight);
+        this.lineProgram.bindUniform('width', scopeSize.y * lineWidth);
 
         this.areaProgram.use();
-        this.areaProgram.bindUniform('u_screen_size', scaledWidth, scaledHeight);
-        this.areaProgram.bindUniform('u_max_height', lineMaxHeight * scopeSize.y);
-        this.areaProgram.bindUniform('u_x_left', paddingLeftRight);
-        this.areaProgram.bindUniform('u_x_right', scaledWidth - paddingLeftRight);
+        this.areaProgram.bindUniform('screenSize', scaledWidth, scaledHeight);
+        this.areaProgram.bindUniform('maxHeight', lineMaxHeight * scopeSize.y);
+        this.areaProgram.bindUniform('xLeft', paddingLeftRight);
+        this.areaProgram.bindUniform('xRight', scaledWidth - paddingLeftRight);
 
         this.scopeSize = scopeSize;
         this.screenSize = new Vec2(scaledWidth, scaledHeight);
@@ -167,14 +167,14 @@ export class Scope {
             const yOffset = paddingTopBottom + (lineAge / lineDelay) * lineStep;
 
             this.areaProgram.use();
-            this.areaProgram.bindAttribute('a_position', line.curtainBuffer);
-            this.areaProgram.bindUniform('u_y', yOffset);
+            this.areaProgram.bindAttribute('position', line.curtainBuffer);
+            this.areaProgram.bindUniform('yOffset', yOffset);
             gl.drawArrays(gl.TRIANGLES, 0, line.vertexCount);
 
             this.lineProgram.use();
-            this.lineProgram.bindAttribute('a_position', line.positionBuffer);
-            this.lineProgram.bindAttribute('a_normal', line.normalBuffer);
-            this.lineProgram.bindUniform('u_y', yOffset);
+            this.lineProgram.bindAttribute('position', line.positionBuffer);
+            this.lineProgram.bindAttribute('normal', line.normalBuffer);
+            this.lineProgram.bindUniform('yOffset', yOffset);
             gl.drawArrays(gl.TRIANGLES, 0, line.vertexCount);
         }
     };

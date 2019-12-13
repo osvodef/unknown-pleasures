@@ -1,24 +1,24 @@
-attribute vec2 a_position;
-attribute vec2 a_normal;
+attribute vec2 position;
+attribute vec2 normal;
 
-uniform float u_x_left;
-uniform float u_x_right;
-uniform float u_y;
+uniform float xLeft;
+uniform float xRight;
+uniform float yOffset;
 
-uniform float u_width;
-uniform float u_max_height;
+uniform float width;
+uniform float maxHeight;
 
-uniform vec2 u_screen_size;
+uniform vec2 screenSize;
 
 void main() {
     vec2 position_screen = vec2(
-        u_x_left + (u_x_right - u_x_left) * a_position.x,
-        u_y + a_position.y * u_max_height
+        xLeft + (xRight - xLeft) * position.x,
+        yOffset + position.y * maxHeight
     );
 
-    vec2 aspect_ratio = vec2(u_max_height / (u_x_right - u_x_left), 1.0);
-    vec2 normal_screen = normalize(a_normal * aspect_ratio) * (u_width / 2.0);
-    vec2 position_ndc = (position_screen + normal_screen) / (u_screen_size / 2.0) - vec2(1.0, 1.0);
+    vec2 aspect_ratio = vec2(maxHeight / (xRight - xLeft), 1.0);
+    vec2 normal_screen = normalize(normal * aspect_ratio) * (width / 2.0);
+    vec2 position_ndc = (position_screen + normal_screen) / (screenSize / 2.0) - vec2(1.0, 1.0);
 
     gl_Position = vec4(position_ndc, 0.0, 1.0);
 }
