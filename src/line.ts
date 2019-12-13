@@ -3,7 +3,7 @@ import { Vec2 } from './vec2';
 export class Line {
     public positionBuffer: WebGLBuffer;
     public normalBuffer: WebGLBuffer;
-    public curtainBuffer: WebGLBuffer;
+    public areaBuffer: WebGLBuffer;
 
     public creationTime: number;
     public vertexCount: number;
@@ -13,17 +13,17 @@ export class Line {
     constructor(gl: WebGLRenderingContext, volumes: number[], creationTime: number) {
         const positionBuffer = gl.createBuffer() as WebGLBuffer;
         const normalBuffer = gl.createBuffer() as WebGLBuffer;
-        const curtainBuffer = gl.createBuffer() as WebGLBuffer;
+        const areaBuffer = gl.createBuffer() as WebGLBuffer;
 
         const bufferSize = (volumes.length - 1) * 6 * 2;
 
         const positions = new Float32Array(bufferSize);
         const normals = new Float32Array(bufferSize);
-        const curtainPositions = new Float32Array(bufferSize);
+        const areaPositions = new Float32Array(bufferSize);
 
         let positionIndex = 0;
         let normalIndex = 0;
-        let curtainIndex = 0;
+        let areaIndex = 0;
         for (let i = 1; i < volumes.length; i++) {
             const prevX = (i - 1) / (volumes.length - 1);
             const currX = i / (volumes.length - 1);
@@ -63,23 +63,23 @@ export class Line {
             normals[normalIndex++] = normal.x;
             normals[normalIndex++] = normal.y;
 
-            curtainPositions[curtainIndex++] = prevX;
-            curtainPositions[curtainIndex++] = 0;
+            areaPositions[areaIndex++] = prevX;
+            areaPositions[areaIndex++] = 0;
 
-            curtainPositions[curtainIndex++] = prevX;
-            curtainPositions[curtainIndex++] = prevY;
+            areaPositions[areaIndex++] = prevX;
+            areaPositions[areaIndex++] = prevY;
 
-            curtainPositions[curtainIndex++] = currX;
-            curtainPositions[curtainIndex++] = currY;
+            areaPositions[areaIndex++] = currX;
+            areaPositions[areaIndex++] = currY;
 
-            curtainPositions[curtainIndex++] = prevX;
-            curtainPositions[curtainIndex++] = 0;
+            areaPositions[areaIndex++] = prevX;
+            areaPositions[areaIndex++] = 0;
 
-            curtainPositions[curtainIndex++] = currX;
-            curtainPositions[curtainIndex++] = currY;
+            areaPositions[areaIndex++] = currX;
+            areaPositions[areaIndex++] = currY;
 
-            curtainPositions[curtainIndex++] = currX;
-            curtainPositions[curtainIndex++] = 0;
+            areaPositions[areaIndex++] = currX;
+            areaPositions[areaIndex++] = 0;
         }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -88,12 +88,12 @@ export class Line {
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, curtainBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, curtainPositions, gl.STATIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, areaBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, areaPositions, gl.STATIC_DRAW);
 
         this.positionBuffer = positionBuffer;
         this.normalBuffer = normalBuffer;
-        this.curtainBuffer = curtainBuffer;
+        this.areaBuffer = areaBuffer;
 
         this.vertexCount = bufferSize / 2;
         this.creationTime = creationTime;
@@ -104,6 +104,6 @@ export class Line {
     public dispose(): void {
         this.gl.deleteBuffer(this.positionBuffer);
         this.gl.deleteBuffer(this.normalBuffer);
-        this.gl.deleteBuffer(this.curtainBuffer);
+        this.gl.deleteBuffer(this.areaBuffer);
     }
 }

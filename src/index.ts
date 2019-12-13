@@ -10,6 +10,7 @@ function init(): void {
     window.scope = new Scope(
         document.querySelector('.display') as HTMLElement,
         document.querySelector('.audio') as HTMLAudioElement,
+        document.querySelector('.progress-bar') as HTMLElement,
     );
 }
 

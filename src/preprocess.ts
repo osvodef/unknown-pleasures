@@ -41,7 +41,7 @@ function applyNoise(value: number): number {
 function smooth(samples: number[]): number[] {
     const result = [];
 
-    const window = 2;
+    const window = 3;
     for (let i = 0; i < samples.length; i++) {
         let sum = 0;
         let count = 0;

@@ -23,6 +23,7 @@ import { preprocess } from './preprocess';
 export class Scope {
     private container: HTMLElement;
     private audioElement: HTMLAudioElement;
+    private progressBar: HTMLElement;
     private canvas: HTMLCanvasElement;
 
     private analyser!: AnalyserNode;
@@ -37,12 +38,13 @@ export class Scope {
     private scopeSize: Vec2;
     private screenSize: Vec2;
 
-    constructor(domElement: HTMLElement, audioElement: HTMLAudioElement) {
-        this.container = domElement;
-        this.audioElement = audioElement;
+    constructor(container: HTMLElement, audio: HTMLAudioElement, progressBar: HTMLElement) {
+        this.container = container;
+        this.audioElement = audio;
+        this.progressBar = progressBar;
         this.canvas = document.createElement('canvas');
 
-        domElement.appendChild(this.canvas);
+        container.appendChild(this.canvas);
 
         this.initAudio();
 
@@ -156,6 +158,8 @@ export class Scope {
             this.lastLineCreationTime = lineCreationTime;
         }
 
+        this.updateProgressBar();
+
         gl.clear(gl.COLOR_BUFFER_BIT);
 
         const paddingTopBottom = (this.screenSize.y - this.scopeSize.y) / 2;
@@ -167,7 +171,7 @@ export class Scope {
             const yOffset = paddingTopBottom + (lineAge / lineDelay) * lineStep;
 
             this.areaProgram.use();
-            this.areaProgram.bindAttribute('position', line.curtainBuffer);
+            this.areaProgram.bindAttribute('position', line.areaBuffer);
             this.areaProgram.bindUniform('yOffset', yOffset);
             gl.drawArrays(gl.TRIANGLES, 0, line.vertexCount);
 
@@ -192,6 +196,13 @@ export class Scope {
         analyser.fftSize = analyserFftSize;
 
         this.analyser = analyser;
+    }
+
+    private updateProgressBar(): void {
+        const { currentTime, duration } = this.audioElement;
+        const elapsedRatio = currentTime / duration;
+
+        this.progressBar.style.transform = `translateX(${-(1 - elapsedRatio) * 100}%)`;
     }
 
     private createLine(creationTime: number): void {
