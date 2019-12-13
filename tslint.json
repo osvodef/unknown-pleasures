@@ -1,0 +1,11 @@
+{
+    "extends": ["tslint-config-airbnb"],
+    "rules": {
+        "ter-indent": [true, 4, { "SwitchCase": 1 }],
+        "no-increment-decrement": false,
+        "no-this-assignment": [true, { "allow-destructuring": true }],
+        "ter-arrow-parens": [true],
+        "semicolon": [true, "always", "ignore-bound-class-methods"],
+        "max-line-length": false
+    }
+}
