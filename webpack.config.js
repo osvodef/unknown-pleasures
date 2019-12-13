@@ -1,3 +1,4 @@
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 
@@ -18,16 +19,20 @@ module.exports = function(env = {}) {
         },
         module: {
             rules: [
-                {test: /\.ts$/, loader: 'ts-loader'},
-                {test: /\.glsl$/, loader: 'webpack-glsl-loader'},
+                {
+                    test: /\.ts$/,
+                    loader: 'ts-loader',
+                    options: {
+                        transpileOnly: true,
+                    },
+                },
+                { test: /\.glsl$/, loader: 'webpack-glsl-loader' },
             ],
         },
         resolve: {
             extensions: ['.ts', '.js', '.glsl'],
         },
-        plugins: [
-            new CopyWebpackPlugin(['assets']),
-        ],
+        plugins: [new ForkTsCheckerWebpackPlugin(), new CopyWebpackPlugin(['assets'])],
         stats: {
             children: false,
         },
