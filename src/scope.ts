@@ -10,7 +10,7 @@ import {
     lineMaxHeight,
     aspectRatio,
     lineCount,
-    lineResolution,
+    analyserFftSize,
     lineDelay,
     minPadding,
     lineColor,
@@ -18,7 +18,7 @@ import {
 } from './constants';
 import { Vec2 } from './vec2';
 import { Program } from './program';
-import { preprocess } from './spectrum';
+import { preprocess } from './preprocess';
 
 export class Scope {
     private container: HTMLElement;
@@ -94,7 +94,6 @@ export class Scope {
         );
 
         this.lineProgram.use();
-        this.lineProgram.bindUniform('u_width', lineWidth);
         this.lineProgram.bindUniform('u_color', ...lineColor);
 
         this.areaProgram.use();
@@ -125,13 +124,14 @@ export class Scope {
         gl.viewport(0, 0, scaledWidth, scaledHeight);
 
         const scopeSize = this.calcScopeSize(scaledWidth, scaledHeight);
-        const paddingLeftRight = (width - scopeSize.x) / 2;
+        const paddingLeftRight = (scaledWidth - scopeSize.x) / 2;
 
         this.lineProgram.use();
         this.lineProgram.bindUniform('u_screen_size', scaledWidth, scaledHeight);
         this.lineProgram.bindUniform('u_max_height', lineMaxHeight * scopeSize.y);
         this.lineProgram.bindUniform('u_x_left', paddingLeftRight);
         this.lineProgram.bindUniform('u_x_right', scaledWidth - paddingLeftRight);
+        this.lineProgram.bindUniform('u_width', scopeSize.y * lineWidth);
 
         this.areaProgram.use();
         this.areaProgram.bindUniform('u_screen_size', scaledWidth, scaledHeight);
@@ -189,7 +189,7 @@ export class Scope {
         source.connect(analyser);
         analyser.connect(ctx.destination);
 
-        analyser.fftSize = lineResolution * 2;
+        analyser.fftSize = analyserFftSize;
 
         this.analyser = analyser;
     }
@@ -207,13 +207,13 @@ export class Scope {
     }
 
     private calcScopeSize(screenWidth: number, screenHeight: number): Vec2 {
-        const availableScreenWidth = screenWidth - 2 * minPadding;
-        const availableScreenHeight = screenHeight - 2 * minPadding;
+        const availableScreenWidth = screenWidth - 2 * minPadding * screenWidth;
+        const availableScreenHeight = screenHeight - 2 * minPadding * screenHeight;
 
         if (availableScreenWidth < availableScreenHeight * aspectRatio) {
-            return new Vec2(availableScreenWidth, availableScreenWidth / aspectRatio);
+            return new Vec2(availableScreenWidth, Math.round(availableScreenWidth / aspectRatio));
         }
 
-        return new Vec2(availableScreenHeight * aspectRatio, availableScreenHeight);
+        return new Vec2(Math.round(availableScreenHeight * aspectRatio), availableScreenHeight);
     }
 }

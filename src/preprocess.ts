@@ -1,13 +1,16 @@
-import { noiseAmount } from './constants';
+import { noiseAmount, signalWidthRatio } from './constants';
 
 export function preprocess(source: Uint8Array): number[] {
-    const spectrum = Array.from(source)
+    const signal = Array.from(source)
         .map((value) => Math.abs(value - 128) / 128)
         .map((value, i, arr) => applyEnvelope(value, i, arr.length));
 
-    return generateZeroes(60)
-        .concat(smooth(spectrum))
-        .concat(generateZeroes(60))
+    const totalLength = Math.round(signal.length / signalWidthRatio);
+    const zeroesLength = Math.round((totalLength * (1 - signalWidthRatio)) / 2);
+
+    return generateZeroes(zeroesLength)
+        .concat(smooth(signal))
+        .concat(generateZeroes(zeroesLength))
         .map((value) => applyNoise(value));
 }
 
