@@ -3,9 +3,9 @@ export const lineCount = 70;
 export const lineWidth = 0.0023;
 
 export const lineDelay = 150;
-export const noiseAmount = 0.0;
 export const signalWidthRatio = 0.65;
 export const analyserFftSize = 512;
+export const smoothingWindow = 0.028;
 
 export const aspectRatio = 13 / 16;
 export const minPadding = 0.05;

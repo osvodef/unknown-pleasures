@@ -18,7 +18,7 @@ import {
 } from './constants';
 import { Vec2 } from './vec2';
 import { Program } from './program';
-import { preprocess } from './preprocess';
+import { preprocess } from './signal';
 
 export class Scope {
     private container: HTMLElement;

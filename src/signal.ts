@@ -1,4 +1,4 @@
-import { noiseAmount, signalWidthRatio } from './constants';
+import { signalWidthRatio, smoothingWindow } from './constants';
 
 export function preprocess(source: Uint8Array): number[] {
     const signal = Array.from(source)
@@ -10,8 +10,7 @@ export function preprocess(source: Uint8Array): number[] {
 
     return generateZeroes(zeroesLength)
         .concat(smooth(signal))
-        .concat(generateZeroes(zeroesLength))
-        .map((value) => applyNoise(value));
+        .concat(generateZeroes(zeroesLength));
 }
 
 function generateZeroes(length: number): number[] {
@@ -30,23 +29,19 @@ function applyEnvelope(value: number, index: number, length: number): number {
     return (value * (Math.sin(2 * Math.PI * (argument - 0.25)) + 1)) / 2;
 }
 
-function applyNoise(value: number): number {
-    if (value > noiseAmount) {
-        return value;
-    }
-
-    return value + Math.random() * noiseAmount;
-}
-
 function smooth(samples: number[]): number[] {
     const result = [];
 
-    const window = 3;
+    const halfWindowWidth = (samples.length * smoothingWindow) / 2;
+
     for (let i = 0; i < samples.length; i++) {
         let sum = 0;
         let count = 0;
 
-        for (let j = i - window; j <= i + window; j++) {
+        const leftBoundary = Math.ceil(i - halfWindowWidth);
+        const rightBoundary = Math.floor(i + halfWindowWidth);
+
+        for (let j = leftBoundary; j <= rightBoundary; j++) {
             if (j >= 0 && j < samples.length) {
                 sum += samples[j];
                 count++;
