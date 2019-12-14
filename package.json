@@ -1,7 +1,7 @@
 {
   "name": "unknown-pleasures",
   "version": "1.0.0",
-  "description": "Unknown Pleasures cover art animated in WebGL",
+  "description": "Unknown Pleasures album cover animated in WebGL",
   "main": "src/index.ts",
   "scripts": {
     "start": "webpack-dev-server",
