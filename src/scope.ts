@@ -38,6 +38,8 @@ export class Scope {
     private scopeSize: Vec2;
     private screenSize: Vec2;
 
+    private hasStarted: boolean;
+
     constructor(container: HTMLElement, audio: HTMLAudioElement, progressBar: HTMLElement) {
         this.container = container;
         this.audioElement = audio;
@@ -108,12 +110,23 @@ export class Scope {
 
         this.createInitialLines();
         this.render();
+
+        this.hasStarted = false;
     }
 
     public play(): void {
-        this.initAudio();
+        if (!this.hasStarted) {
+            this.initAudio();
+            this.renderLoop();
+
+            this.hasStarted = true;
+        }
+
         this.audioElement.play();
-        this.renderLoop();
+    }
+
+    public pause(): void {
+        this.audioElement.pause();
     }
 
     private resetSize = (): void => {
