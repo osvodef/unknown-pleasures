@@ -107,8 +107,6 @@ export class Scope {
         this.resetSize();
 
         this.createInitialLines();
-        this.createLineLoop();
-
         this.render();
     }
 
@@ -158,31 +156,13 @@ export class Scope {
         this.render();
     };
 
-    private createLineLoop = (): void => {
-        requestAnimationFrame(this.createLineLoop);
-
-        const lineCreationTime = Math.floor(Date.now() / lineDelay) * lineDelay;
-
-        if (lineCreationTime > this.lastLineCreationTime) {
-            const blankLineCount =
-                Math.round((lineCreationTime - this.lastLineCreationTime) / lineDelay) - 1;
-
-            for (let i = 0; i < blankLineCount; i++) {
-                this.createBlankLine(this.lastLineCreationTime + (i + 1) * lineDelay);
-            }
-
-            this.createLine(lineCreationTime);
-
-            this.lastLineCreationTime = lineCreationTime;
-        }
-    };
-
     private render(): void {
         const { gl, lines } = this;
 
         const time = Date.now();
 
         this.updateProgressBar();
+        this.updateLines();
 
         gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -243,6 +223,28 @@ export class Scope {
         this.lastLineCreationTime = currentCreationTime;
     }
 
+    private updateLines(): void {
+        while (this.lines.length > lineCount) {
+            this.lines[0].dispose();
+            this.lines.shift();
+        }
+
+        const lineCreationTime = Math.floor(Date.now() / lineDelay) * lineDelay;
+
+        if (lineCreationTime > this.lastLineCreationTime) {
+            const blankLineCount =
+                Math.round((lineCreationTime - this.lastLineCreationTime) / lineDelay) - 1;
+
+            for (let i = 0; i < blankLineCount; i++) {
+                this.createBlankLine(this.lastLineCreationTime + (i + 1) * lineDelay);
+            }
+
+            this.createLine(lineCreationTime);
+
+            this.lastLineCreationTime = lineCreationTime;
+        }
+    }
+
     private createLine(creationTime: number): void {
         if (this.analyser !== undefined) {
             const array = new Uint8Array(this.analyser.frequencyBinCount);
@@ -251,11 +253,6 @@ export class Scope {
             this.lines.push(new Line(this.gl, preprocess(array), creationTime));
         } else {
             this.createBlankLine(creationTime);
-        }
-
-        while (this.lines.length > lineCount) {
-            this.lines[0].dispose();
-            this.lines.shift();
         }
     }
 
