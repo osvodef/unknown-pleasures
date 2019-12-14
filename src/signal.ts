@@ -13,7 +13,7 @@ export function preprocess(source: Uint8Array): number[] {
         .concat(generateZeroes(zeroesLength));
 }
 
-function generateZeroes(length: number): number[] {
+export function generateZeroes(length: number): number[] {
     const result = [];
 
     for (let i = 0; i < length; i++) {

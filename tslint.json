@@ -6,6 +6,7 @@
         "no-this-assignment": [true, { "allow-destructuring": true }],
         "ter-arrow-parens": [true],
         "semicolon": [true, "always", "ignore-bound-class-methods"],
-        "max-line-length": false
+        "max-line-length": false,
+        "align": [true, "elements", "members", "parameters", "statements"]
     }
 }

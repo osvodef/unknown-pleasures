@@ -18,7 +18,7 @@ import {
 } from './constants';
 import { Vec2 } from './vec2';
 import { Program } from './program';
-import { preprocess } from './signal';
+import { preprocess, generateZeroes } from './signal';
 
 export class Scope {
     private container: HTMLElement;
@@ -26,7 +26,7 @@ export class Scope {
     private progressBar: HTMLElement;
     private canvas: HTMLCanvasElement;
 
-    private analyser!: AnalyserNode;
+    private analyser?: AnalyserNode;
 
     private gl: WebGLRenderingContext;
     private lineProgram: Program;
@@ -45,8 +45,6 @@ export class Scope {
         this.canvas = document.createElement('canvas');
 
         container.appendChild(this.canvas);
-
-        this.initAudio();
 
         window.addEventListener('resize', this.resetSize);
 
@@ -108,10 +106,19 @@ export class Scope {
         this.screenSize = new Vec2(0, 0);
         this.resetSize();
 
+        this.createInitialLines();
+        this.createLineLoop();
+
         this.render();
     }
 
-    public resetSize = (): void => {
+    public play(): void {
+        this.initAudio();
+        this.audioElement.play();
+        this.renderLoop();
+    }
+
+    private resetSize = (): void => {
         const { gl, canvas, container } = this;
 
         const width = container.clientWidth;
@@ -145,18 +152,35 @@ export class Scope {
         this.screenSize = new Vec2(scaledWidth, scaledHeight);
     };
 
-    private render = (): void => {
-        const { gl, lines } = this;
+    private renderLoop = (): void => {
+        requestAnimationFrame(this.renderLoop);
 
-        requestAnimationFrame(this.render);
+        this.render();
+    };
 
-        const time = Date.now();
-        const lineCreationTime = Math.floor(time / lineDelay) * lineDelay;
+    private createLineLoop = (): void => {
+        requestAnimationFrame(this.createLineLoop);
+
+        const lineCreationTime = Math.floor(Date.now() / lineDelay) * lineDelay;
 
         if (lineCreationTime > this.lastLineCreationTime) {
+            const blankLineCount =
+                Math.round((lineCreationTime - this.lastLineCreationTime) / lineDelay) - 1;
+
+            for (let i = 0; i < blankLineCount; i++) {
+                this.createBlankLine(this.lastLineCreationTime + (i + 1) * lineDelay);
+            }
+
             this.createLine(lineCreationTime);
+
             this.lastLineCreationTime = lineCreationTime;
         }
+    };
+
+    private render(): void {
+        const { gl, lines } = this;
+
+        const time = Date.now();
 
         this.updateProgressBar();
 
@@ -181,9 +205,13 @@ export class Scope {
             this.lineProgram.bindUniform('yOffset', yOffset);
             gl.drawArrays(gl.TRIANGLES, 0, line.vertexCount);
         }
-    };
+    }
 
     private initAudio(): void {
+        if (this.analyser !== undefined) {
+            return;
+        }
+
         const audioContext = window.AudioContext || window.webkitAudioContext;
 
         const ctx = new audioContext();
@@ -205,16 +233,34 @@ export class Scope {
         this.progressBar.style.transform = `translateX(${-(1 - elapsedRatio) * 100}%)`;
     }
 
-    private createLine(creationTime: number): void {
-        const array = new Uint8Array(this.analyser.frequencyBinCount);
-        this.analyser.getByteTimeDomainData(array);
+    private createInitialLines(): void {
+        const currentCreationTime = Math.floor(Date.now() / lineDelay) * lineDelay;
 
-        this.lines.push(new Line(this.gl, preprocess(array), creationTime));
+        for (let i = 0; i < lineCount; i++) {
+            this.createBlankLine(currentCreationTime - (lineCount - 1 - i) * lineDelay);
+        }
+
+        this.lastLineCreationTime = currentCreationTime;
+    }
+
+    private createLine(creationTime: number): void {
+        if (this.analyser !== undefined) {
+            const array = new Uint8Array(this.analyser.frequencyBinCount);
+            this.analyser.getByteTimeDomainData(array);
+
+            this.lines.push(new Line(this.gl, preprocess(array), creationTime));
+        } else {
+            this.createBlankLine(creationTime);
+        }
 
         while (this.lines.length > lineCount) {
             this.lines[0].dispose();
             this.lines.shift();
         }
+    }
+
+    private createBlankLine(creationTime: number): void {
+        this.lines.push(new Line(this.gl, generateZeroes(2), creationTime));
     }
 
     private calcScopeSize(screenWidth: number, screenHeight: number): Vec2 {
