@@ -1,4 +1,5 @@
 import { Scope } from './scope';
+import { lyrics } from './lyrics';
 
 if (isSupported()) {
     init();
@@ -25,6 +26,8 @@ function init(): void {
 
         scope.play();
     });
+
+    console.log(lyrics);
 
     window.scope = scope;
 }
