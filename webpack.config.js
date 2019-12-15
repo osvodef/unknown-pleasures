@@ -32,7 +32,10 @@ module.exports = function(env = {}) {
         resolve: {
             extensions: ['.ts', '.js', '.glsl'],
         },
-        plugins: [new ForkTsCheckerWebpackPlugin(), new CopyWebpackPlugin(['assets'])],
+        plugins: [
+            new ForkTsCheckerWebpackPlugin(),
+            new CopyWebpackPlugin(['assets']),
+        ],
         stats: {
             children: false,
         },

@@ -11,11 +11,12 @@ function init(): void {
     let isPlaying = false;
     let isFirstStart = true;
 
-    const scope = new Scope(
-        document.querySelector('.display') as HTMLElement,
-        document.querySelector('.audio') as HTMLAudioElement,
-        document.querySelector('.progress-bar') as HTMLElement,
-    );
+    const scope = new Scope({
+        container: document.querySelector('.display') as HTMLElement,
+        audio: document.querySelector('.audio') as HTMLAudioElement,
+        progressBar: document.querySelector('.progress-bar') as HTMLElement,
+        useAudioApiFallback: shouldUseAudioApiFallback(),
+    });
 
     window.scope = scope;
 
@@ -71,4 +72,28 @@ function isSupported(): boolean {
     } catch (e) {
         return false;
     }
+}
+
+function getIosVersion(): number[] | undefined {
+    if (!/iP(hone|od|ad)/.test(navigator.platform)) {
+        return undefined;
+    }
+
+    const version = navigator.appVersion.match(/OS (\d+)_(\d+)_?(\d+)?/);
+
+    if (version === null) {
+        return undefined;
+    }
+
+    return [parseInt(version[1], 10), parseInt(version[2], 10), parseInt(version[3] || '0', 10)];
+}
+
+function shouldUseAudioApiFallback(): boolean {
+    const iosVersion = getIosVersion();
+
+    if (iosVersion === undefined) {
+        return false;
+    }
+
+    return iosVersion[0] === 13 && iosVersion[1] >= 2;
 }

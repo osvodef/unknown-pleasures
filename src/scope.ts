@@ -19,6 +19,14 @@ import {
 import { Vec2 } from './vec2';
 import { Program } from './program';
 import { preprocess, generateZeroes } from './signal';
+import { FallbackAnalyserNode } from './fallback/analyserNode';
+
+interface ScopeOptions {
+    container: HTMLElement;
+    audio: HTMLAudioElement;
+    progressBar: HTMLElement;
+    useAudioApiFallback: boolean;
+}
 
 export class Scope {
     private container: HTMLElement;
@@ -26,7 +34,7 @@ export class Scope {
     private progressBar: HTMLElement;
     private canvas: HTMLCanvasElement;
 
-    private analyser?: AnalyserNode;
+    private analyser?: AnalyserNode | FallbackAnalyserNode;
 
     private gl: WebGLRenderingContext;
     private lineProgram: Program;
@@ -39,8 +47,13 @@ export class Scope {
     private screenSize: Vec2;
 
     private hasStarted: boolean;
+    private useAudioApiFallback: boolean;
 
-    constructor(container: HTMLElement, audio: HTMLAudioElement, progressBar: HTMLElement) {
+    constructor(options: ScopeOptions) {
+        const { container, audio, progressBar, useAudioApiFallback } = options;
+
+        this.useAudioApiFallback = !!useAudioApiFallback;
+
         this.container = container;
         this.audioElement = audio;
         this.progressBar = progressBar;
@@ -129,6 +142,10 @@ export class Scope {
         this.audioElement.pause();
     }
 
+    public isPaused(): boolean {
+        return this.audioElement.paused;
+    }
+
     private resetSize = (): void => {
         const { gl, canvas, container } = this;
 
@@ -205,18 +222,22 @@ export class Scope {
             return;
         }
 
-        const audioContext = window.AudioContext || window.webkitAudioContext;
+        if (this.useAudioApiFallback) {
+            this.analyser = new FallbackAnalyserNode(this);
+        } else {
+            const audioContext = window.AudioContext || window.webkitAudioContext;
 
-        const ctx = new audioContext();
-        const analyser = ctx.createAnalyser();
-        const source = ctx.createMediaElementSource(this.audioElement);
+            const ctx = new audioContext();
+            const analyser = ctx.createAnalyser();
+            const source = ctx.createMediaElementSource(this.audioElement);
 
-        source.connect(analyser);
-        analyser.connect(ctx.destination);
+            source.connect(analyser);
+            analyser.connect(ctx.destination);
 
-        analyser.fftSize = analyserFftSize;
+            analyser.fftSize = analyserFftSize;
 
-        this.analyser = analyser;
+            this.analyser = analyser;
+        }
     }
 
     private updateProgressBar(): void {
