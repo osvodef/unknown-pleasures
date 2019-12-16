@@ -11,12 +11,15 @@ uniform float maxHeight;
 uniform vec2 screenSize;
 
 void main() {
+    float widthScreen = xRight - xLeft;
+    float heightScreen = maxHeight;
+
     vec2 positionScreen = vec2(
-        xLeft + (xRight - xLeft) * position.x,
-        yOffset + position.y * maxHeight
+        xLeft + widthScreen * position.x,
+        yOffset + heightScreen * position.y
     );
 
-    vec2 aspectRatioCorrection = vec2(maxHeight, xRight - xLeft);
+    vec2 aspectRatioCorrection = vec2(heightScreen, widthScreen);
     vec2 normalScreen = normalize(normal * aspectRatioCorrection) * (width / 2.0);
     vec2 positionNdc = (positionScreen + normalScreen) / (screenSize / 2.0) - vec2(1.0, 1.0);
 
