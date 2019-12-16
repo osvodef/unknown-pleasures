@@ -142,10 +142,6 @@ export class Scope {
         this.audioElement.pause();
     }
 
-    public isPaused(): boolean {
-        return this.audioElement.paused;
-    }
-
     private resetSize = (): void => {
         const { gl, canvas, container } = this;
 
@@ -223,7 +219,7 @@ export class Scope {
         }
 
         if (this.useAudioApiFallback) {
-            this.analyser = new FallbackAnalyserNode(this);
+            this.analyser = new FallbackAnalyserNode(this.audioElement);
         } else {
             const audioContext = window.AudioContext || window.webkitAudioContext;
 
