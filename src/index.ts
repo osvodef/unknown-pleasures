@@ -23,16 +23,23 @@ function init(): void {
     const startOverlay = document.querySelector('.start-overlay') as HTMLDivElement;
     const playOverlay = document.querySelector('.play-overlay') as HTMLDivElement;
     const pauseOverlay = document.querySelector('.pause-overlay') as HTMLDivElement;
+    const homeLink = document.querySelector('.home-link') as HTMLAnchorElement;
 
     startOverlay.style.visibility = 'visible';
+
+    homeLink.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
 
     document.body.addEventListener('click', () => {
         if (!isPlaying) {
             scope.play();
 
             if (isFirstStart) {
-                startOverlay.style.opacity = '0';
                 isFirstStart = false;
+
+                startOverlay.style.opacity = '0';
+                setTimeout(() => (startOverlay.style.display = 'none'), 300);
             } else {
                 blink(playOverlay);
             }

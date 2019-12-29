@@ -8,7 +8,8 @@ export const analyserFftSize = 512;
 export const smoothingWindow = 0.028;
 
 export const aspectRatio = 13 / 16;
-export const minPadding = 0.05;
+export const minPaddingLeftRightPercent = 0.05;
+export const minPaddingTopBottomPx = 50;
 
 export const backgroundColor = [0.051, 0.039, 0.02, 1];
 export const lineColor = [0.933, 0.918, 0.906, 1.0];
