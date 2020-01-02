@@ -30,6 +30,9 @@ body {
     justify-content: center;
     align-items: center;
     user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .play-overlay,
@@ -64,6 +67,7 @@ body {
     height: 3px;
     background-color: #eeeae7;
     transform: translateX(-100%);
+    -webkit-transform: translateX(-100%);
 }
 
 .home-button {
