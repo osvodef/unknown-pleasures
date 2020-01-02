@@ -72,13 +72,14 @@ body {
 
 .home-button {
     position: absolute;
-    bottom: 10px;
-    left: calc(50% - 15px);
-    width: 30px;
-    height: 30px;
-    border-radius: 4px;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border-bottom-right-radius: 4px;
     background-color: #0d0a05;
-    border: 1px solid #eeeae7;
+    border-right: 1px solid #eeeae7;
+    border-bottom: 1px solid #eeeae7;
     opacity: 0.75;
 }
 
@@ -95,7 +96,7 @@ body {
 .home-icon {
     width: 20px;
     height: 20px;
-    margin: 5px 0 0 5px;
+    margin: 10px 0 0 10px;
 }
 
 .no-webgl {

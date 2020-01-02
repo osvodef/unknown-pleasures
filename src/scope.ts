@@ -12,8 +12,7 @@ import {
     lineCount,
     analyserFftSize,
     lineDelay,
-    minPaddingLeftRightPercent,
-    minPaddingTopBottomPx,
+    minPadding,
     lineColor,
     backgroundColor,
 } from './constants';
@@ -292,9 +291,8 @@ export class Scope {
     }
 
     private calcScopeSize(screenWidth: number, screenHeight: number): Vec2 {
-        const availableScreenWidth = screenWidth - 2 * minPaddingLeftRightPercent * screenWidth;
-        const availableScreenHeight =
-            screenHeight - 2 * minPaddingTopBottomPx * window.devicePixelRatio;
+        const availableScreenWidth = screenWidth - 2 * minPadding * screenWidth;
+        const availableScreenHeight = screenHeight - 2 * minPadding * screenHeight;
 
         if (availableScreenWidth < availableScreenHeight * aspectRatio) {
             return new Vec2(availableScreenWidth, Math.round(availableScreenWidth / aspectRatio));
